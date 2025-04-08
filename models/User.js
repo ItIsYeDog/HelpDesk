@@ -11,8 +11,7 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Vennligst oppgi et passord'],
-        minlength: [6, 'Passordet må være minst 6 tegn'],
-        select: false
+        minlength: [6, 'Passordet må være minst 6 tegn']
     },
     role: {
         type: String,

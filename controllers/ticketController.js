@@ -188,3 +188,38 @@ exports.getTicketHistory = async (req, res) => {
         });
     }
 };
+
+exports.deleteTicket = async (req, res) => {
+    try {
+        const ticket = await Ticket.findById(req.params.id);
+
+        if (!ticket) {
+            return res.status(404).render('error', {
+                title: 'Ikke funnet',
+                message: 'Ticketen ble ikke funnet'
+            });
+        }
+
+        // Sjekk om brukeren er admin eller oppretteren av ticketen
+        if (req.user.role !== 'admin' && ticket.createdBy.toString() !== req.user._id.toString()) {
+            return res.status(403).render('error', {
+                title: 'Ingen tilgang',
+                message: 'Du har ikke tillatelse til å slette denne ticketen'
+            });
+        }
+
+        // Slett ticketen
+        await ticket.deleteOne();
+
+        if (req.user.role === 'admin') {
+            res.redirect('/dashboard/admin');
+        } else {
+            res.redirect('/dashboard/user');
+        }
+    } catch (err) {
+        res.status(500).render('error', {
+            title: 'Feil',
+            message: 'Noe gikk galt under sletting av ticketen'
+        });
+    }
+};

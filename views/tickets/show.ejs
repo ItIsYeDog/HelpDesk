@@ -85,46 +85,60 @@
                         </div>
                     </div>
 
-<div class="lg:col-span-1 space-y-4">
-    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
-        <h3 class="text-lg font-semibold mb-4">Ticket Informasjon</h3>
-        <dl class="space-y-4">
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Kategori</dt>
-                <dd class="mt-1 text-sm text-gray-900"><%= ticket.category %></dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Status</dt>
-                <dd class="mt-1">
-                    <span class="px-2 py-1 text-sm rounded-full
-                        <%= ticket.status === 'Åpen' ? 'bg-yellow-100 text-yellow-800' : 
-                            ticket.status === 'Under arbeid' ? 'bg-blue-100 text-blue-800' : 
-                            'bg-green-100 text-green-800' %>">
-                        <%= ticket.status %>
-                    </span>
-                </dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Prioritet</dt>
-                <dd class="mt-1">
-                    <span class="px-2 py-1 text-sm rounded-full
-                        <%= ticket.priority === 'Høy' ? 'bg-red-100 text-red-800' : 
-                            ticket.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
-                            'bg-green-100 text-green-800' %>">
-                        <%= ticket.priority %>
-                    </span>
-                </dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Opprettet av</dt>
-                <dd class="mt-1 text-sm text-gray-900"><%= ticket.createdBy.username %></dd>
-            </div>
-            <div>
-                <dt class="text-sm font-medium text-gray-500">Opprettet dato</dt>
-                <dd class="mt-1 text-sm text-gray-900">
-                    <%= new Date(ticket.createdAt).toLocaleDateString('no-NO') %>
-                </dd>
-            </div>
+                    <div class="lg:col-span-1 space-y-4">
+                        <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+                            <h3 class="text-lg font-semibold mb-4">Ticket Informasjon</h3>
+                            <dl class="space-y-4">
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Kategori</dt>
+                                    <dd class="mt-1 text-sm text-gray-900"><%= ticket.category %></dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Status</dt>
+                                    <dd class="mt-1">
+                                        <span class="px-2 py-1 text-sm rounded-full
+                                            <%= ticket.status === 'Åpen' ? 'bg-yellow-100 text-yellow-800' : 
+                                                ticket.status === 'Under arbeid' ? 'bg-blue-100 text-blue-800' : 
+                                                'bg-green-100 text-green-800' %>">
+                                            <%= ticket.status %>
+                                        </span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Prioritet</dt>
+                                    <dd class="mt-1">
+                                        <span class="px-2 py-1 text-sm rounded-full
+                                            <%= ticket.priority === 'Høy' ? 'bg-red-100 text-red-800' : 
+                                                ticket.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
+                                                'bg-green-100 text-green-800' %>">
+                                            <%= ticket.priority %>
+                                        </span>
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Opprettet av</dt>
+                                    <dd class="mt-1 text-sm text-gray-900"><%= ticket.createdBy.username %></dd>
+                                </div>
+                                <div>
+                                    <dt class="text-sm font-medium text-gray-500">Opprettet dato</dt>
+                                    <dd class="mt-1 text-sm text-gray-900">
+                                        <%= new Date(ticket.createdAt).toLocaleDateString('no-NO') %>
+                                    </dd>
+                                </div>
+                    
+                                <!-- Slette-knapp -->
+                                <% if (user.role === 'admin' || ticket.createdBy._id.toString() === user._id.toString()) { %>
+                                    <div class="pt-4 border-t border-gray-200">
+                                        <form action="/tickets/<%= ticket._id %>?_method=DELETE" method="POST" onsubmit="return confirm('Er du sikker på at du vil slette denne ticketen?');">
+                                            <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                                                Slett Ticket
+                                            </button>
+                                        </form>
+                                    </div>
+                                <% } %>
+                            </dl>
+                        </div>
+                    </div>
 
             <% if (user.role === 'admin') { %>
                 <div class="pt-4 border-t border-gray-200">
@@ -281,6 +295,43 @@ function addMessage(message) {
         </div>
     `;
     messages.insertAdjacentHTML('beforeend', messageHtml);
+}
+
+async function updateTicketStatus(ticketId, status) {
+    try {
+        const response = await fetch(`/tickets/${ticketId}/status`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+        });
+        
+        if (!response.ok) throw new Error('Kunne ikke oppdatere status');
+        location.reload();
+    } catch (err) {
+        alert('En feil oppstod ved oppdatering av status');
+    }
+}
+
+async function updateTicketPriority(ticketId, newPriority) {
+    try {
+        const response = await fetch(`/tickets/${ticketId}/priority`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ priority: newPriority })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Kunne ikke oppdatere prioritet');
+        }
+
+        location.reload();
+    } catch (err) {
+        console.error('Feil under oppdatering av prioritet:', err);
+        alert('Noe gikk galt under oppdatering av prioritet.');
+    }
 }
 
 loadTicketHistory();

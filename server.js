@@ -11,6 +11,7 @@ const { loginLimiter, generalLimiter } = require('./middleware/rateLimitMiddlewa
 const http = require('http');
 const socketIo = require('socket.io');
 const socketHandler = require('./utils/socketHandler');
+const methodOverride = require('method-override');
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(methodOverride('_method'));
 
 // Legge til rate limiting
 app.use('/auth/login', loginLimiter);

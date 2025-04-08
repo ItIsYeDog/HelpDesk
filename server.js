@@ -10,71 +10,106 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
 const http = require('http');
 const socketIo = require('socket.io');
-
-// Load env vars
-dotenv.config();
-
-// Connect to database
-connectDB();
-
-// Initialize express
 const app = express();
-
-// Create HTTP server
 const server = http.createServer(app);
 const io = socketIo(server);
+dotenv.config();
 
-// Socket.IO setup
+connectDB();
+
 io.on('connection', (socket) => {
     socket.on('joinTicket', (ticketId) => {
         socket.join(`ticket-${ticketId}`);
     });
 });
 
-// Make io accessible to our route handlers
 app.set('io', io);
 
-// View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rate limiting
-const limiter = rateLimit({
+
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    handler: (req, res) => {
+        if (req.xhr || req.headers.accept.includes('application/json')) {
+            res.status(429).json({
+                status: 'error',
+                message: 'For mange innloggingsforsøk. Vennligst prøv igjen senere.'
+            });
+        } else {
+            res.status(429).render('auth/login', {
+                title: 'Logg inn',
+                error: 'For mange innloggingsforsøk. Vennligst prøv igjen senere.'
+            });
+        }
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
-    message: 'Too many requests from this IP, please try again later.',
+    handler: (req, res) => {
+        if (req.xhr || req.headers.accept.includes('application/json')) {
+            res.status(429).json({
+                status: 'error',
+                message: 'For mange forespørsler. Vennligst prøv igjen senere.'
+            });
+        } else {
+            res.redirect('back');
+        }
+    },
+    standardHeaders: true,
+    legacyHeaders: false,
 });
-app.use('/api', limiter);
 
-// Routes
+app.use('/auth/login', loginLimiter);
+app.use(['/dashboard', '/tickets'], generalLimiter);
+
 app.use('/', homeRoutes);
 app.use('/auth', authRoutes);
 app.use('/dashboard', dashboardRoutes);
 app.use('/tickets', ticketRoutes);
 
-// Error handling
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).render('error', {
-        message: 'Something broke!',
-        error: process.env.NODE_ENV === 'development' ? err : {}
+app.use((req, res, next) => {
+    res.status(404).render('error', {
+        title: 'Ikke funnet',
+        status: 404,
+        message: 'Siden du leter etter ble ikke funnet',
+        error: null
     });
 });
 
-const PORT = process.env.PORT || 3000;
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    
+    const status = err.status || 500;
+    const message = status === 404 
+        ? 'Siden du leter etter ble ikke funnet'
+        : 'Beklager, noe gikk galt';
 
-// Start server
+    res.status(status).render('error', {
+        title: status === 404 ? 'Ikke funnet' : 'Feil',
+        status: status,
+        message: message,
+        error: process.env.NODE_ENV === 'development' ? err : null
+    });
+});
+
+const PORT = process.env.PORT;
+
 server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.log('UNHANDLED REJECTION! 💥 Shutting down...');
     console.log(err.name, err.message);
@@ -83,7 +118,6 @@ process.on('unhandledRejection', (err) => {
     });
 });
 
-// Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
     console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
     console.log(err.name, err.message);

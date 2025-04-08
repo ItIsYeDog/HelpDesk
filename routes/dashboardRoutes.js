@@ -3,7 +3,6 @@ const router = express.Router();
 const dashboardController = require('../controllers/dashboardController');
 const { isLoggedIn, restrictTo } = require('../middleware/authMiddleware');
 
-// Beskytt alle ruter etter dette middleware
 router.use(isLoggedIn);
 
 router.get('/user', dashboardController.getUserDashboard);

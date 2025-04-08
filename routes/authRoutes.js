@@ -1,17 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
+const { redirectIfLoggedIn } = require('../middleware/authMiddleware');
 
-// Auth routes
-router.get('/login', (req, res) => {
+router.get('/login', redirectIfLoggedIn, (req, res) => {
     res.render('auth/login', { title: 'Logg inn' });
 });
 
-router.get('/register', (req, res) => {
+router.get('/register', redirectIfLoggedIn, (req, res) => {
     res.render('auth/register', { title: 'Registrer deg' });
 });
 
 router.post('/login', authController.login);
 router.post('/register', authController.register);
+router.get('/logout', authController.logout);
 
 module.exports = router;

@@ -1,0 +1,55 @@
+<%- include('partials/header') %>
+
+<div class="flex flex-col min-h-screen bg-gray-50">
+    <main class="flex-grow">
+        <div class="relative isolate">
+            <div class="mx-auto max-w-7xl px-6 py-12 sm:py-16 lg:py-20">
+                <div class="text-center">
+                    <h1 class="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+                        Om Helpdesk System
+                    </h1>
+                    <p class="mt-6 text-lg leading-8 text-gray-600 max-w-2xl mx-auto">
+                        Dette prosjektet er et IT-støttesystem designet for å håndtere brukerhenvendelser effektivt.
+                        Det inkluderer funksjoner som brukerautentisering, rollebasert tilgangskontroll, og sanntidsoppdateringer via WebSockets.
+                    </p>
+                </div>
+
+                <div class="mt-16 max-w-5xl mx-auto">
+                    <h2 class="text-2xl font-semibold text-gray-900">Hvordan det fungerer</h2>
+                    <p class="mt-4 text-gray-600">
+                        Helpdesk Systemet lar brukere opprette og administrere supporthenvendelser. Administratorer kan tildele henvendelser til teammedlemmer, og alle oppdateringer synkroniseres i sanntid.
+                    </p>
+                </div>
+
+                <div class="mt-16 max-w-5xl mx-auto">
+                    <h2 class="text-2xl font-semibold text-gray-900">GitHub Repository</h2>
+                    <p class="mt-4 text-gray-600">
+                        Kildekoden for dette prosjektet er tilgjengelig på GitHub. Klikk på lenken nedenfor for å se prosjektet:
+                    </p>
+                    <a href="https://github.com/ItIsYeDog/HelpDesk" target="_blank" class="mt-4 inline-block text-blue-600 hover:underline">
+                        GitHub Repository
+                    </a>
+                </div>
+
+                <div class="mt-16 max-w-5xl mx-auto">
+                    <h2 class="text-2xl font-semibold text-gray-900">Diagrammer</h2>
+                    <p class="mt-4 text-gray-600">
+                        Nedenfor finner du nettverksdiagrammet og ER-diagrammet for prosjektet:
+                    </p>
+                    <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Nettverksdiagram</h3>
+                            <img src="/images/network-diagram.png" alt="Nettverksdiagram" class="mt-4 rounded-lg shadow-md">
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">ER-diagram</h3>
+                            <img src="/images/er-diagram.png" alt="ER-diagram" class="mt-4 rounded-lg shadow-md">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <%- include('partials/footer') %>
+</div>

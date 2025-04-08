@@ -1,18 +1,28 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
-// Generer JWT token
 const signToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '1h' // Hardkoder verdien i stedet for å bruke env variabel
+        expiresIn: process.env.JWT_EXPIRES_IN || '1h'
     });
+};
+
+const getExpirationMs = (expiresIn) => {
+    const unit = expiresIn.slice(-1);
+    const value = parseInt(expiresIn.slice(0, -1));
+    
+    switch(unit) {
+        case 'h': return value * 60 * 60 * 1000;
+        case 'd': return value * 24 * 60 * 60 * 1000;
+        case 'w': return value * 7 * 24 * 60 * 60 * 1000;
+        default: return 60 * 60 * 1000;
+    }
 };
 
 exports.register = async (req, res) => {
     try {
         const { username, password } = req.body;
 
-        // Sjekk om bruker eksisterer
         const existingUser = await User.findOne({ username });
         if (existingUser) {
             return res.render('auth/register', {
@@ -21,7 +31,6 @@ exports.register = async (req, res) => {
             });
         }
 
-        // Opprett ny bruker
         const newUser = await User.create({
             username,
             password,
@@ -30,14 +39,12 @@ exports.register = async (req, res) => {
 
         const token = signToken(newUser._id);
         
-        // Fikset cookie options
         res.cookie('jwt', token, {
-            expires: new Date(Date.now() + 60 * 60 * 1000), // 1 time
+            expires: new Date(Date.now() + getExpirationMs(process.env.JWT_EXPIRES_IN || '1h')),
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production'
         });
 
-        // Redirect til dashboard basert på rolle
         if (newUser.role === 'admin') {
             res.redirect('/dashboard/admin');
         } else {
@@ -55,7 +62,6 @@ exports.login = async (req, res) => {
     try {
         const { username, password, role } = req.body;
 
-        // Sjekk om bruker eksisterer
         const user = await User.findOne({ username });
         
         if (!user || !(await user.correctPassword(password, user.password))) {
@@ -65,7 +71,6 @@ exports.login = async (req, res) => {
             });
         }
 
-        // Sjekk om rollen matcher
         if (user.role !== role) {
             return res.render('auth/login', {
                 title: 'Logg inn',
@@ -76,12 +81,11 @@ exports.login = async (req, res) => {
         const token = signToken(user._id);
         
         res.cookie('jwt', token, {
-            expires: new Date(Date.now() + 60 * 60 * 1000), // 1 time
+            expires: new Date(Date.now() + getExpirationMs(process.env.JWT_EXPIRES_IN || '1h')),
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production'
         });
 
-        // Redirect basert på rolle
         if (user.role === 'admin') {
             res.redirect('/dashboard/admin');
         } else {
@@ -93,4 +97,12 @@ exports.login = async (req, res) => {
             error: err.message
         });
     }
+};
+
+exports.logout = (req, res) => {
+    res.cookie('jwt', 'loggedout', {
+        expires: new Date(Date.now() + 10 * 1000),
+        httpOnly: true
+    });
+    res.redirect('/auth/login');
 };

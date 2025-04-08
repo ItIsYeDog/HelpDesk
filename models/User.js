@@ -24,14 +24,12 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-// Hash password før lagring
 userSchema.pre('save', async function(next) {
     if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 12);
     next();
 });
 
-// Metode for å sjekke passord
 userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
     return await bcrypt.compare(candidatePassword, userPassword);
 };

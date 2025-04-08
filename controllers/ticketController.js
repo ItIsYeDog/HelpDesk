@@ -40,18 +40,15 @@ exports.getTicket = async (req, res) => {
             .populate('assignedTo', 'username');
 
         if (!ticket) {
-            return res.status(404).render('error', {
-                title: 'Ikke funnet',
-                message: 'Ticket ikke funnet'
-            });
+            const error = new Error('Ticket ikke funnet');
+            error.status = 404;
+            throw error;
         }
 
-        // Fetch messages for this ticket
         const messages = await Message.find({ ticketId: ticket._id })
             .populate('sender', 'username')
             .sort('createdAt');
 
-        // Sjekk om brukeren har tilgang til ticketen
         if (req.user.role !== 'admin' && ticket.createdBy._id.toString() !== req.user._id.toString()) {
             return res.status(403).render('error', {
                 title: 'Ikke tilgang',
@@ -66,9 +63,7 @@ exports.getTicket = async (req, res) => {
             user: req.user
         });
     } catch (err) {
-        res.status(500).render('error', {
-            message: err.message
-        });
+        next(err);
     }
 };
 
@@ -77,7 +72,6 @@ exports.updateTicketStatus = async (req, res) => {
         const { status } = req.body;
         const ticket = await Ticket.findById(req.params.id);
         
-        // Create history entry
         await TicketHistory.create({
             ticketId: ticket._id,
             updatedBy: req.user._id,
@@ -86,7 +80,6 @@ exports.updateTicketStatus = async (req, res) => {
             newValue: status
         });
 
-        // Update ticket
         ticket.status = status;
         ticket.updatedAt = Date.now();
         await ticket.save();
@@ -105,7 +98,6 @@ exports.updateTicketPriority = async (req, res) => {
         const { priority } = req.body;
         const ticket = await Ticket.findById(req.params.id);
         
-        // Create history entry
         await TicketHistory.create({
             ticketId: ticket._id,
             updatedBy: req.user._id,
@@ -114,7 +106,6 @@ exports.updateTicketPriority = async (req, res) => {
             newValue: priority
         });
 
-        // Update ticket
         ticket.priority = priority;
         ticket.updatedAt = Date.now();
         await ticket.save();
@@ -166,7 +157,6 @@ exports.getTicketChat = async (req, res) => {
             });
         }
 
-        // Fetch messages for this ticket
         const messages = await Message.find({ ticketId: ticket._id })
             .populate('sender', 'username')
             .sort('createdAt');

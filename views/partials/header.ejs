@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="no" class="h-full bg-gray-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> | Helpdesk</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+<body class="h-full">
+    <nav class="bg-white border-b border-gray-200">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex h-16 justify-between items-center">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-semibold text-gray-900">Helpdesk</span>
+                    </a>
+                </div>
+                <div class="hidden sm:flex sm:items-center sm:space-x-4">
+                    <a href="/auth/login" class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                        Logg inn
+                    </a>
+                    <a href="/auth/register" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Registrer deg
+                    </a>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="sm:hidden">
+                    <button type="button" class="p-2 text-gray-600 hover:text-gray-900">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>

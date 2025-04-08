@@ -1,0 +1,89 @@
+<%- include('../partials/header') %>
+
+<div class="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-lg">
+        <div>
+            <h2 class="text-center text-3xl font-bold tracking-tight text-gray-900">
+                Logg inn på din konto
+            </h2>
+            <% if (locals.error) { %>
+                <div class="mt-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                    <%= error %>
+                </div>
+            <% } %>
+        </div>
+
+        <form class="mt-8 space-y-6" id="loginForm" action="/auth/login" method="POST">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">
+                    Brukernavn
+                </label>
+                <div class="mt-1">
+                    <input id="username" 
+                           name="username" 
+                           type="text" 
+                           required 
+                           class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">
+                    Passord
+                </label>
+                <div class="mt-1">
+                    <input id="password" 
+                           name="password" 
+                           type="password" 
+                           required 
+                           class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm">
+                </div>
+            </div>
+
+            <div>
+                <label for="role" class="block text-sm font-medium text-gray-700">
+                    Velg rolle
+                </label>
+                <div class="mt-1">
+                    <select id="role" 
+                            name="role" 
+                            required 
+                            class="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm">
+                        <option value="">Velg en rolle</option>
+                        <option value="user">Bruker</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <button type="submit" 
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Logg inn
+                </button>
+            </div>
+        </form>
+
+        <div class="mt-6">
+            <div class="relative">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Eller</span>
+                </div>
+            </div>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Ikke registrert?
+                    <a href="/auth/register" class="font-medium text-blue-600 hover:text-blue-500">
+                        Registrer deg her
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include('../partials/footer') %>

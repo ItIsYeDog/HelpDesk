@@ -1,0 +1,299 @@
+<%- include('../partials/dashboardHeader') %>
+
+<div class="min-h-screen flex flex-col bg-gray-100">
+    <div class="flex flex-1">
+        <!-- Sidebar - Hide on mobile -->
+        <div class="hidden md:block">
+            <%- include('../partials/sidebar') %>
+        </div>
+
+        <!-- Mobile Header -->
+        <div class="md:hidden fixed top-0 left-0 right-0 bg-white z-10 border-b border-gray-200">
+            <div class="flex items-center justify-between px-4 h-16">
+                <button id="menuButton" class="p-2 rounded-md text-gray-600 hover:bg-gray-100">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <h1 class="text-lg font-medium">Ticket #<%= ticket._id.toString().slice(-6) %></h1>
+            </div>
+        </div>
+
+        <div class="flex-1 md:ml-64 flex flex-col">
+            <!-- Header - Hide on mobile -->
+            <header class="hidden md:block bg-white shadow-sm">
+                <div class="flex items-center justify-between h-16 px-4 md:px-8">
+                    <div class="flex items-center space-x-4">
+                        <h1 class="text-xl md:text-2xl font-semibold text-gray-900">Ticket #<%= ticket._id.toString().slice(-6) %></h1>
+                        <span class="px-3 py-1 text-sm rounded-full
+                            <%= ticket.status === 'Åpen' ? 'bg-yellow-100 text-yellow-800' : 
+                                ticket.status === 'Under arbeid' ? 'bg-blue-100 text-blue-800' : 
+                                'bg-green-100 text-green-800' %>">
+                            <%= ticket.status %>
+                        </span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-4 md:p-8 mt-16 md:mt-0">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+                    <!-- Ticket Details & Chat -->
+                    <div class="lg:col-span-2 space-y-4 md:space-y-6">
+                        <!-- Ticket Info -->
+                        <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+                            <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4"><%= ticket.title %></h2>
+                            <p class="text-gray-600 text-sm md:text-base mb-3 md:mb-4"><%= ticket.description %></p>
+                            <div class="text-xs md:text-sm text-gray-500">
+                                Opprettet av <%= ticket.createdBy.username %> - <%= new Date(ticket.createdAt).toLocaleDateString('no-NO') %>
+                            </div>
+                        </div>
+
+                        <!-- Chat Section -->
+                        <div class="bg-white rounded-lg shadow-sm">
+                            <div class="border-b border-gray-200 p-4">
+                                <h3 class="text-lg font-semibold">Meldinger</h3>
+                            </div>
+                            
+                            <!-- Messages Container -->
+                            <div id="messages" class="p-4 space-y-3 h-[calc(100vh-400px)] md:h-96 overflow-y-auto">
+                                <% messages.forEach(message => { %>
+                                    <div class="flex <%= message.sender._id.toString() === user._id.toString() ? 'justify-end' : 'justify-start' %>">
+                                        <div class="max-w-[75%] md:max-w-lg <%= message.sender._id.toString() === user._id.toString() ? 
+                                            'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900' %> rounded-lg px-3 py-2 md:px-4 md:py-2 shadow">
+                                            <div class="flex items-center space-x-2 text-xs md:text-sm">
+                                                <span class="font-medium"><%= message.sender.username %></span>
+                                                <span class="<%= message.sender._id.toString() === user._id.toString() ? 
+                                                    'text-blue-100' : 'text-gray-500' %>">
+                                                    <%= new Date(message.createdAt).toLocaleTimeString('no-NO', { 
+                                                        hour: '2-digit', 
+                                                        minute: '2-digit' 
+                                                    }) %>
+                                                </span>
+                                            </div>
+                                            <p class="mt-1 text-sm md:text-base break-words"><%= message.content %></p>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+
+                            <!-- Message Input -->
+                            <div class="border-t border-gray-200 p-3 md:p-4">
+                                <form id="messageForm" class="flex space-x-2 md:space-x-4">
+                                    <input type="text" 
+                                           id="messageInput"
+                                           class="flex-1 text-sm md:text-base rounded-lg border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                           placeholder="Skriv en melding...">
+                                    <button type="submit"
+                                            class="px-3 py-2 md:px-4 md:py-2 text-sm md:text-base bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                        Send
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+<div class="lg:col-span-1 space-y-4">
+    <div class="bg-white rounded-lg shadow-sm p-4 md:p-6">
+        <h3 class="text-lg font-semibold mb-4">Ticket Informasjon</h3>
+        <dl class="space-y-4">
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Kategori</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= ticket.category %></dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                <dd class="mt-1">
+                    <span class="px-2 py-1 text-sm rounded-full
+                        <%= ticket.status === 'Åpen' ? 'bg-yellow-100 text-yellow-800' : 
+                            ticket.status === 'Under arbeid' ? 'bg-blue-100 text-blue-800' : 
+                            'bg-green-100 text-green-800' %>">
+                        <%= ticket.status %>
+                    </span>
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Prioritet</dt>
+                <dd class="mt-1">
+                    <span class="px-2 py-1 text-sm rounded-full
+                        <%= ticket.priority === 'Høy' ? 'bg-red-100 text-red-800' : 
+                            ticket.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : 
+                            'bg-green-100 text-green-800' %>">
+                        <%= ticket.priority %>
+                    </span>
+                </dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Opprettet av</dt>
+                <dd class="mt-1 text-sm text-gray-900"><%= ticket.createdBy.username %></dd>
+            </div>
+            <div>
+                <dt class="text-sm font-medium text-gray-500">Opprettet dato</dt>
+                <dd class="mt-1 text-sm text-gray-900">
+                    <%= new Date(ticket.createdAt).toLocaleDateString('no-NO') %>
+                </dd>
+            </div>
+
+            <% if (user.role === 'admin') { %>
+                <div class="pt-4 border-t border-gray-200">
+                    <h4 class="text-sm font-medium text-gray-500 mb-2">Oppdater Status</h4>
+                    <select onchange="updateTicketStatus('<%= ticket._id %>', this.value)" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        <option value="Åpen" <%= ticket.status === 'Åpen' ? 'selected' : '' %>>Åpen</option>
+                        <option value="Under arbeid" <%= ticket.status === 'Under arbeid' ? 'selected' : '' %>>Under arbeid</option>
+                        <option value="Løst" <%= ticket.status === 'Løst' ? 'selected' : '' %>>Løst</option>
+                    </select>
+
+                    <h4 class="text-sm font-medium text-gray-500 mb-2 mt-4">Oppdater Prioritet</h4>
+                    <select onchange="updateTicketPriority('<%= ticket._id %>', this.value)" 
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        <option value="Lav" <%= ticket.priority === 'Lav' ? 'selected' : '' %>>Lav</option>
+                        <option value="Medium" <%= ticket.priority === 'Medium' ? 'selected' : '' %>>Medium</option>
+                        <option value="Høy" <%= ticket.priority === 'Høy' ? 'selected' : '' %>>Høy</option>
+                    </select>
+                </div>
+            <% } %>
+
+            <div class="mt-6 border-t border-gray-200 pt-6">
+                <h4 class="text-sm font-medium text-gray-500 mb-4">Endringshistorikk</h4>
+                <div id="historyContainer" class="space-y-4">
+                </div>
+            </div>
+        </dl>
+    </div>
+</div>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Menu -->
+<div id="mobileMenu" class="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 hidden">
+    <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-gray-900 text-white">
+        <div class="flex items-center justify-between h-16 px-6 bg-gray-800">
+            <span class="text-xl font-semibold">Helpdesk</span>
+            <button id="closeMenu" class="p-2 rounded-md text-gray-400 hover:text-white">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <%- include('../partials/sidebar-content') %>
+    </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+const ticketId = '<%= ticket._id %>';
+const messages = document.getElementById('messages');
+const messageForm = document.getElementById('messageForm');
+const messageInput = document.getElementById('messageInput');
+
+document.getElementById('menuButton')?.addEventListener('click', () => {
+    document.getElementById('mobileMenu').classList.remove('hidden');
+});
+
+document.getElementById('closeMenu')?.addEventListener('click', () => {
+    document.getElementById('mobileMenu').classList.add('hidden');
+});
+
+document.getElementById('mobileMenu')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('mobileMenu')) {
+        document.getElementById('mobileMenu').classList.add('hidden');
+    }
+});
+
+socket.emit('joinTicket', ticketId);
+
+async function loadTicketHistory() {
+    try {
+        const response = await fetch(`/tickets/${ticketId}/history`);
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error('Kunne ikke laste historikk');
+        
+        const historyContainer = document.getElementById('historyContainer');
+        historyContainer.innerHTML = data.history.map(item => `
+            <div class="flex items-start space-x-3 text-sm">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <div>
+                    <p class="text-gray-900">
+                        ${item.changeType === 'status' ? 'Status endret fra ' : 'Prioritet endret fra '}
+                        <span class="font-medium">${item.oldValue}</span> til 
+                        <span class="font-medium">${item.newValue}</span>
+                    </p>
+                    <p class="text-gray-500">
+                        Endret av ${item.updatedBy.username} - 
+                        ${new Date(item.createdAt).toLocaleString('no-NO')}
+                    </p>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error('Error loading history:', err);
+    }
+}
+
+socket.on('newMessage', (message) => {
+    addMessage(message);
+    messages.scrollTop = messages.scrollHeight;
+});
+
+socket.on('ticketUpdated', () => {
+    loadTicketHistory();
+});
+
+messageForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const content = messageInput.value.trim();
+    if (!content) return;
+
+    try {
+        const response = await fetch(`/tickets/${ticketId}/messages`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ content })
+        });
+
+        if (!response.ok) throw new Error('Kunne ikke sende melding');
+        messageInput.value = '';
+    } catch (err) {
+        alert('En feil oppstod ved sending av melding');
+    }
+});
+
+function addMessage(message) {
+    const isCurrentUser = message.sender._id === '<%= user._id %>';
+    const messageHtml = `
+        <div class="flex ${isCurrentUser ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-lg ${isCurrentUser ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-900'} rounded-lg px-4 py-2 shadow">
+                <div class="flex items-center space-x-2">
+                    <span class="font-medium">${message.sender.username}</span>
+                    <span class="text-xs ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'}">
+                        ${new Date(message.createdAt).toLocaleTimeString('no-NO', { 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        })}
+                    </span>
+                </div>
+                <p class="mt-1">${message.content}</p>
+            </div>
+        </div>
+    `;
+    messages.insertAdjacentHTML('beforeend', messageHtml);
+}
+
+loadTicketHistory();
+</script>
+
+</body>
+</html>

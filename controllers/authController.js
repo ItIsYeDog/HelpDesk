@@ -42,7 +42,8 @@ exports.register = async (req, res) => {
         res.cookie('jwt', token, {
             expires: new Date(Date.now() + getExpirationMs(process.env.JWT_EXPIRES_IN || '1h')),
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production'
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
         });
 
         if (newUser.role === 'admin') {

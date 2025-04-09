@@ -12,7 +12,15 @@ const ticketSchema = new mongoose.Schema({
     category: {
         type: String,
         required: [true, 'Velg en kategori'],
-        enum: ['Hardware', 'Software', 'Network', 'Other']
+        enum: [
+            'Maskinvare',       
+            'Programvare',      
+            'Nettverk',         
+            'Brukerstøtte',     
+            'Sikkerhet',        
+            'Tilgang',          
+            'Annet'             
+        ]
     },
     status: {
         type: String,

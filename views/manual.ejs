@@ -2,7 +2,6 @@
 
 <div class="min-h-screen flex flex-col bg-gray-100">
     <div class="flex flex-1">
-        <!-- Sidebar -->
         <div class="hidden md:block">
             <%- include('partials/sidebar') %>
         </div>
@@ -18,7 +17,6 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="flex-1 md:ml-64 flex flex-col">
             <header class="hidden md:block bg-white shadow-sm">
                 <div class="flex items-center justify-between h-16 px-8">
@@ -31,7 +29,6 @@
                     <h2 class="text-xl font-semibold mb-4">Hvordan bruke systemet</h2>
 
                     <% if (['førsteLinjeSupport', 'andreLinjeSupport'].includes(role)) { %>
-                        <!-- Veiledning for supportroller -->
                         <section>
                             <h3 class="text-lg font-semibold text-blue-600">Veiledning for supportroller</h3>
                             <p class="mt-2 text-gray-600">
@@ -64,7 +61,6 @@
                             </p>
                         </section>
                     <% } else { %>
-                        <!-- Veiledning for kunder -->
                         <section>
                             <h3 class="text-lg font-semibold text-blue-600">Veiledning for kunder</h3>
                             <p class="mt-2 text-gray-600">

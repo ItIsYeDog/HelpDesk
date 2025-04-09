@@ -38,7 +38,7 @@ exports.getTicket = async (req, res) => {
     try {
         const ticket = await Ticket.findById(req.params.id)
             .populate('createdBy', 'username')
-            .populate('assignedTo', 'username role'); // Populerer assignedTo med username og role
+            .populate('assignedTo', 'username role');
 
         if (!ticket) {
             return res.status(404).render('error', {
@@ -48,7 +48,7 @@ exports.getTicket = async (req, res) => {
             });
         }
 
-        console.log('Ticket:', JSON.stringify(ticket, null, 2)); // Debugging
+        //console.log('Ticket:', JSON.stringify(ticket, null, 2)); // Debugging
 
         const users = await User.find({ role: { $in: ['førsteLinjeSupport', 'andreLinjeSupport'] } });
 

@@ -2,7 +2,6 @@
 
 <div class="min-h-screen flex flex-col bg-gray-100">
     <div class="flex flex-1">
-        <!-- Sidebar -->
         <div class="hidden md:block">
             <%- include('../partials/sidebar') %>
         </div>
@@ -18,7 +17,6 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="flex-1 md:ml-64 flex flex-col">
             <header class="hidden md:block bg-white shadow-sm">
                 <div class="flex items-center justify-between h-16 px-8">
@@ -28,7 +26,6 @@
 
             <main class="flex-1 p-4 md:p-8 mt-16 md:mt-0">
                 <div class="bg-white rounded-lg shadow-sm p-6">
-                    <!-- Filter Form -->
                     <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                         <div>
                             <label for="search" class="block text-sm font-medium text-gray-700">Søk</label>
@@ -73,7 +70,6 @@
                         </div>
                     </form>
 
-                    <!-- Liste over Tickets -->
                     <ul class="divide-y divide-gray-200">
                         <% tickets.forEach(ticket => { %>
                             <li class="py-4 flex justify-between items-center">

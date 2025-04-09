@@ -55,7 +55,7 @@ exports.getAdminDashboard = async (req, res) => {
 
 exports.getUserManagement = async (req, res) => {
     try {
-        const users = await User.find().sort('username'); // Hent alle brukere
+        const users = await User.find().sort('username');
         res.render('admin/userManagement', {
             title: 'Brukeradministrasjon',
             users,
@@ -71,7 +71,7 @@ exports.getUserManagement = async (req, res) => {
 
 exports.updateUserRole = async (req, res) => {
     try {
-        const { role } = req.body; // Ny rolle fra forespørselen
+        const { role } = req.body;
         const user = await User.findById(req.params.id);
 
         if (!user) {

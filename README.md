@@ -137,7 +137,7 @@ Her er en oversikt over databasens struktur og relasjoner mellom modellene:
 ### Topografisk Kart
 Her er en oversikt over nettverksflyten og infrastrukturen:
 
-![Topografisk Kart](./images/topo.png)
+![Topografisk Kart](<img width="1280" alt="topograf" src="https://github.com/user-attachments/assets/2c1c7b70-e3b7-4b5e-9e91-5eed4e47e010" />)
 
 
 ## Sikkerhet

@@ -1,0 +1,138 @@
+<%- include('partials/dashboardHeader') %>
+
+<div class="min-h-screen flex flex-col bg-gray-100">
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+        <div class="hidden md:block">
+            <%- include('partials/sidebar') %>
+        </div>
+
+        <div class="md:hidden fixed top-0 left-0 right-0 bg-white z-10 border-b border-gray-200">
+            <div class="flex items-center justify-between px-4 h-16">
+                <button id="menuButton" class="p-2 rounded-md text-gray-600 hover:bg-gray-100">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+                <h1 class="text-lg font-medium">BrukerVeileding</h1>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 md:ml-64 flex flex-col">
+            <header class="hidden md:block bg-white shadow-sm">
+                <div class="flex items-center justify-between h-16 px-8">
+                    <h1 class="text-2xl font-semibold text-gray-900">Brukermanual</h1>
+                </div>
+            </header>
+
+            <main class="flex-1 p-6 md:p-8 mt-16 md:mt-0">
+                <div class="bg-white rounded-lg shadow-sm p-6 space-y-8">
+                    <h2 class="text-xl font-semibold mb-4">Hvordan bruke systemet</h2>
+
+                    <% if (['førsteLinjeSupport', 'andreLinjeSupport'].includes(role)) { %>
+                        <!-- Veiledning for supportroller -->
+                        <section>
+                            <h3 class="text-lg font-semibold text-blue-600">Veiledning for supportroller</h3>
+                            <p class="mt-2 text-gray-600">
+                                Som en del av supportteamet har du en viktig rolle i å sikre at kundene får rask og effektiv hjelp. 
+                                Her er en oversikt over dine oppgaver og hvordan du bruker systemet:
+                            </p>
+                            <ul class="list-disc list-inside mt-2 text-gray-600 space-y-2">
+                                <li>
+                                    <strong>Overvåke nye tickets:</strong> Gå til <strong>"Support Dashboard"</strong> for å se nye tickets som trenger oppfølging.
+                                    Du kan filtrere tickets basert på status, prioritet eller tildelt person.
+                                </li>
+                                <li>
+                                    <strong>Oppdatere status og prioritet:</strong> Når du jobber med en ticket, kan du oppdatere statusen 
+                                    (f.eks. "Under arbeid" eller "Løst") og justere prioriteten basert på alvorlighetsgraden av problemet.
+                                </li>
+                                <li>
+                                    <strong>Kommunisere med kunder:</strong> Bruk meldingsfunksjonen i tickets for å holde kundene oppdatert 
+                                    om fremdriften og for å stille oppfølgingsspørsmål.
+                                </li>
+                                <li>
+                                    <strong>Eskalere tickets:</strong> Hvis problemet krever mer ekspertise, kan du eskalere ticketen til andre linje 
+                                    ved å tildele den til en kollega med rollen "andreLinjeSupport".
+                                </li>
+                                <li>
+                                    <strong>Historikk:</strong> Se gjennom ticketens historikk for å forstå tidligere handlinger og kommunikasjon.
+                                </li>
+                            </ul>
+                            <p class="mt-4 text-gray-600">
+                                Husk å holde kommunikasjonen profesjonell og tydelig, og sørg for å oppdatere statusen til ticketen når problemet er løst.
+                            </p>
+                        </section>
+                    <% } else { %>
+                        <!-- Veiledning for kunder -->
+                        <section>
+                            <h3 class="text-lg font-semibold text-blue-600">Veiledning for kunder</h3>
+                            <p class="mt-2 text-gray-600">
+                                Som kunde kan du bruke systemet til å rapportere problemer og følge opp dine henvendelser. 
+                                Her er en oversikt over hvordan du bruker systemet:
+                            </p>
+                            <ul class="list-disc list-inside mt-2 text-gray-600 space-y-2">
+                                <li>
+                                    <strong>Opprette nye tickets:</strong> Klikk på <strong>"Ny Ticket"</strong> for å rapportere et problem. 
+                                    Fyll ut skjemaet med en beskrivelse av problemet, og velg en passende kategori.
+                                </li>
+                                <li>
+                                    <strong>Se status og detaljer:</strong> Gå til <strong>"Mine Tickets"</strong> for å se en liste over dine eksisterende tickets. 
+                                    Du kan se statusen (f.eks. "Åpen", "Under arbeid" eller "Løst") og detaljer for hver ticket.
+                                </li>
+                                <li>
+                                    <strong>Kommunisere med supportteamet:</strong> Bruk meldingsfunksjonen i tickets for å stille spørsmål eller gi mer informasjon 
+                                    til supportteamet.
+                                </li>
+                            </ul>
+                            <p class="mt-4 text-gray-600">
+                                Systemet er designet for å gjøre det enkelt for deg å få hjelp. Hvis du har spørsmål, kan du kontakte supportteamet via en ticket.
+                            </p>
+                        </section>
+                    <% } %>
+                </div>
+            </main>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-white border-t border-gray-200 mt-auto">
+    <div class="mx-auto px-4 md:px-6 py-4">
+        <p class="text-center text-xs md:text-sm text-gray-500">
+            &copy; <%= new Date().getFullYear() %> Helpdesk System. Alle rettigheter reservert.
+        </p>
+    </div>
+</footer>
+
+<div id="mobileMenu" class="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 hidden">
+    <div class="fixed inset-y-0 left-0 max-w-xs w-full bg-gray-900 text-white">
+        <div class="flex items-center justify-between h-16 px-6 bg-gray-800">
+            <span class="text-xl font-semibold">Helpdesk</span>
+            <button id="closeMenu" class="p-2 rounded-md text-gray-400 hover:text-white">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <%- include('partials/sidebar-content') %>
+    </div>
+</div>
+
+<script>
+    document.getElementById('menuButton')?.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.remove('hidden');
+    });
+
+    document.getElementById('closeMenu')?.addEventListener('click', () => {
+        document.getElementById('mobileMenu').classList.add('hidden');
+    });
+
+    document.getElementById('mobileMenu')?.addEventListener('click', (e) => {
+        if (e.target === document.getElementById('mobileMenu')) {
+            document.getElementById('mobileMenu').classList.add('hidden');
+        }
+    });
+</script>
+    
+</body>
+</html>

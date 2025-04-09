@@ -36,16 +36,11 @@ exports.createTicket = async (req, res) => {
 
 exports.getTicket = async (req, res) => {
     try {
-        // Debug
-        // console.log('Henter ticket med ID:', req.params.id);
-
         const ticket = await Ticket.findById(req.params.id)
             .populate('createdBy', 'username')
-            .populate('assignedTo', 'username role');
+            .populate('assignedTo', 'username role'); // Populerer assignedTo med username og role
 
         if (!ticket) {
-            // Debug
-            // console.log('Ticket ikke funnet');
             return res.status(404).render('error', {
                 title: 'Ikke funnet',
                 status: 404,
@@ -53,20 +48,13 @@ exports.getTicket = async (req, res) => {
             });
         }
 
-        // Debug
-        // console.log('Ticket funnet:', ticket);
+        console.log('Ticket:', JSON.stringify(ticket, null, 2)); // Debugging
 
         const users = await User.find({ role: { $in: ['førsteLinjeSupport', 'andreLinjeSupport'] } });
-        // Debug
-        //console.log('Brukere med riktig rolle:', users);
 
-        // Hent meldinger knyttet til ticketen
         const messages = await Message.find({ ticketId: ticket._id })
             .populate('sender', 'username')
             .sort('createdAt');
-
-        // Debug
-        // console.log('Meldinger knyttet til ticket:', messages);
 
         res.render('tickets/show', {
             title: `Ticket #${ticket._id.toString().slice(-6)}`,
@@ -272,31 +260,62 @@ exports.assignTicket = async (req, res) => {
 
 exports.getFilteredTickets = async (req, res) => {
     try {
-        const { status, priority, assignedTo, search } = req.query;
+        const { search, status, priority, assignedTo } = req.query;
 
-        // Bygg en dynamisk query basert på query parameters
-        const query = {};
+        // Bygg filter basert på brukerens rolle
+        let filter = {};
 
-        if (status) query.status = status;
-        if (priority) query.priority = priority;
-        if (assignedTo) query.assignedTo = assignedTo;
-        if (search) {
-            query.$or = [
-                { title: { $regex: search, $options: 'i' } }, // Søk i tittel
-                { description: { $regex: search, $options: 'i' } } // Søk i beskrivelse
-            ];
+        if (req.user.role === 'admin') {
+            // Admin kan se alle tickets
+            filter = {};
+        } else if (['førsteLinjeSupport', 'andreLinjeSupport'].includes(req.user.role)) {
+            // 1. og 2. linje-support kan se tickets som er tildelt dem
+            filter = { assignedTo: req.user._id };
+        } else {
+            // Vanlige brukere kan se tickets de har opprettet eller som er tildelt dem
+            filter = {
+                $or: [
+                    { createdBy: req.user._id },
+                    { assignedTo: req.user._id }
+                ]
+            };
         }
 
-        // Hent tickets basert på query
-        const tickets = await Ticket.find(query)
+        // Legg til søkefiltre hvis de er oppgitt
+        if (search) {
+            const searchFilter = {
+                $or: [
+                    { title: { $regex: search, $options: 'i' } },
+                    { description: { $regex: search, $options: 'i' } }
+                ]
+            };
+            filter = { ...filter, ...searchFilter };
+        }
+
+        if (status) {
+            filter.status = status;
+        }
+
+        if (priority) {
+            filter.priority = priority;
+        }
+
+        if (assignedTo) {
+            filter.assignedTo = assignedTo;
+        }
+
+        // Hent tickets basert på filteret
+        const tickets = await Ticket.find(filter)
             .populate('createdBy', 'username')
             .populate('assignedTo', 'username')
             .sort('-createdAt');
 
+        // Hent brukere for filtreringsmenyen
         const users = await User.find({ role: { $in: ['førsteLinjeSupport', 'andreLinjeSupport'] } });
 
+        // Render søkesiden med tickets og brukere
         res.render('tickets/search', {
-            title: 'Tickets',
+            title: 'Søk etter Tickets',
             tickets,
             users,
             user: req.user
@@ -307,31 +326,5 @@ exports.getFilteredTickets = async (req, res) => {
             title: 'Feil',
             message: 'Noe gikk galt under henting av tickets'
         });
-    }
-};
-
-exports.addFeedback = async (req, res) => {
-    try {
-        const { rating, comment } = req.body;
-
-        const ticket = await Ticket.findById(req.params.id);
-
-        if (!ticket) {
-            return res.status(404).json({ message: 'Ticket ikke funnet' });
-        }
-
-        // Sjekk om ticket er løst
-        if (ticket.status !== 'Løst') {
-            return res.status(400).json({ message: 'Tilbakemelding kan kun gis på løste tickets' });
-        }
-
-        // Legg til tilbakemelding
-        ticket.feedback = { rating, comment };
-        await ticket.save();
-
-        res.status(200).json({ message: 'Tilbakemelding lagt til', ticket });
-    } catch (err) {
-        console.error('Feil under lagring av tilbakemelding:', err);
-        res.status(500).json({ message: 'Noe gikk galt under lagring av tilbakemelding' });
     }
 };

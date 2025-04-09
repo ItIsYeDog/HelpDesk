@@ -125,37 +125,6 @@
                                         <%= new Date(ticket.createdAt).toLocaleDateString('no-NO') %>
                                     </dd>
                                 </div>
-                                <% if (ticket.status === 'Løst' && !ticket.feedback) { %>
-                                    <div class="mt-6">
-                                        <h3 class="text-lg font-semibold">Gi tilbakemelding</h3>
-                                        <form action="/tickets/<%= ticket._id %>/feedback" method="POST" class="mt-4">
-                                            <label for="rating" class="block text-sm font-medium text-gray-700">Vurdering</label>
-                                            <select id="rating" name="rating" required
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
-                                                <option value="1">1 - Dårlig</option>
-                                                <option value="2">2 - Under forventning</option>
-                                                <option value="3">3 - OK</option>
-                                                <option value="4">4 - Bra</option>
-                                                <option value="5">5 - Utmerket</option>
-                                            </select>
-                                
-                                            <label for="comment" class="block text-sm font-medium text-gray-700 mt-4">Kommentar</label>
-                                            <textarea id="comment" name="comment" rows="4"
-                                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"></textarea>
-                                
-                                            <button type="submit"
-                                                class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                                Send Tilbakemelding
-                                            </button>
-                                        </form>
-                                    </div>
-                                <% } else if (ticket.feedback) { %>
-                                    <div class="mt-6">
-                                        <h3 class="text-lg font-semibold">Tilbakemelding</h3>
-                                        <p><strong>Vurdering:</strong> <%= ticket.feedback.rating %>/5</p>
-                                        <p><strong>Kommentar:</strong> <%= ticket.feedback.comment %></p>
-                                    </div>
-                                <% } %>
                                 <div>
                                     <dt class="text-sm font-medium text-gray-500">Tildelt til</dt>
                                     <dd class="mt-1 text-sm text-gray-900">

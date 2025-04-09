@@ -15,8 +15,6 @@ router.post('/:id/messages', ticketController.createMessage);
 router.get('/:id/chat', isLoggedIn, ticketController.getTicketChat);
 router.get('/:id/history', isLoggedIn, ticketController.getTicketHistory);
 router.delete('/:id', restrictTo('admin'), ticketController.deleteTicket);
-router.post('/:id/feedback', restrictTo('user'), ticketController.addFeedback);
-
 
 // Oppdaterer statusen til en ticket
 // - Krever at brukeren er logget inn (via `isLoggedIn` middleware som brukes globalt i denne filen)

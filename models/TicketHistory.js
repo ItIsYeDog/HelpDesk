@@ -13,7 +13,7 @@ const ticketHistorySchema = new mongoose.Schema({
     },
     changeType: {
         type: String,
-        enum: ['status', 'priority', 'comment'],
+        enum: ['status', 'priority', 'comment', 'assignedTo'],
         required: true
     },
     oldValue: String,

@@ -7,11 +7,12 @@ router.get('/login', redirectIfLoggedIn, (req, res) => {
     res.render('auth/login', { title: 'Logg inn' });
 });
 
+router.post('/login', authController.login);
+
 router.get('/register', redirectIfLoggedIn, (req, res) => {
     res.render('auth/register', { title: 'Registrer deg' });
 });
 
-router.post('/login', authController.login);
 router.post('/register', authController.register);
 router.get('/logout', authController.logout);
 

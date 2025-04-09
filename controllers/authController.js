@@ -61,41 +61,44 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-        const { username, password, role } = req.body;
+        const { username, password } = req.body;
 
+        // Finn brukeren basert på brukernavn
         const user = await User.findOne({ username });
-        
+
         if (!user || !(await user.correctPassword(password, user.password))) {
-            return res.render('auth/login', {
+            return res.status(401).render('auth/login', {
                 title: 'Logg inn',
-                error: 'Feil brukernavn eller passord'
+                error: 'Ugyldig brukernavn eller passord'
             });
         }
 
-        if (user.role !== role) {
-            return res.render('auth/login', {
-                title: 'Logg inn',
-                error: 'Ugyldig rolle for denne brukeren'
-            });
-        }
-
-        const token = signToken(user._id);
-        
-        res.cookie('jwt', token, {
-            expires: new Date(Date.now() + getExpirationMs(process.env.JWT_EXPIRES_IN || '1h')),
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production'
+        // Opprett JWT-token
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES_IN
         });
 
+        // Konverter JWT_COOKIE_EXPIRES_IN til millisekunder
+        const cookieExpiresInMs = getExpirationMs(process.env.JWT_COOKIE_EXPIRES_IN || '7d');
+
+        // Sett token som cookie
+        res.cookie('jwt', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: cookieExpiresInMs
+        });
+
+        // Omdiriger basert på brukerens rolle
         if (user.role === 'admin') {
-            res.redirect('/dashboard/admin');
+            return res.redirect('/dashboard/admin');
         } else {
-            res.redirect('/dashboard/user');
+            return res.redirect('/dashboard/user');
         }
     } catch (err) {
-        res.render('auth/login', {
+        console.error('Feil under innlogging:', err);
+        res.status(500).render('auth/login', {
             title: 'Logg inn',
-            error: err.message
+            error: 'Noe gikk galt under innlogging. Prøv igjen senere.'
         });
     }
 };

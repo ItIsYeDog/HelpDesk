@@ -11,4 +11,8 @@ router.get('/admin',
     dashboardController.getAdminDashboard
 );
 
+router.get('/admin/users', restrictTo('admin'), dashboardController.getUserManagement);
+router.patch('/admin/users/:id/role', restrictTo('admin'), dashboardController.updateUserRole);
+router.get('/support', restrictTo('førsteLinjeSupport', 'andreLinjeSupport'), dashboardController.getSupportDashboard);
+
 module.exports = router;

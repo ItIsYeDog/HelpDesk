@@ -29,7 +29,7 @@ exports.redirectIfLoggedIn = async (req, res, next) => {
 exports.isLoggedIn = async (req, res, next) => {
     try {
         const token = req.cookies.jwt;
-        
+
         if (!token) {
             return res.redirect('/auth/login');
         }
@@ -43,9 +43,19 @@ exports.isLoggedIn = async (req, res, next) => {
 
         res.locals.user = user;
         req.user = user;
+
+        if (req.originalUrl.startsWith('/dashboard/admin') && user.role !== 'admin') {
+            return res.redirect('/dashboard/user');
+        }
+
+        if (req.originalUrl.startsWith('/dashboard/user') && user.role === 'admin') {
+            return res.redirect('/dashboard/admin');
+        }
+
         next();
     } catch (err) {
-        next(err);
+        console.error('Feil i isLoggedIn middleware:', err);
+        res.redirect('/auth/login');
     }
 };
 

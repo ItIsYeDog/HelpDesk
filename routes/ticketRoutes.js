@@ -5,6 +5,8 @@ const { isLoggedIn, restrictTo } = require('../middleware/authMiddleware');
 
 router.use(isLoggedIn);
 
+router.get('/search', ticketController.getFilteredTickets);
+
 router.get('/new', ticketController.getNewTicketForm);
 router.post('/', ticketController.createTicket);
 router.get('/:id', ticketController.getTicket);
@@ -12,7 +14,9 @@ router.get('/:id', ticketController.getTicket);
 router.post('/:id/messages', ticketController.createMessage);
 router.get('/:id/chat', isLoggedIn, ticketController.getTicketChat);
 router.get('/:id/history', isLoggedIn, ticketController.getTicketHistory);
-router.delete('/:id', isLoggedIn, ticketController.deleteTicket);
+router.delete('/:id', restrictTo('admin'), ticketController.deleteTicket);
+router.post('/:id/feedback', restrictTo('user'), ticketController.addFeedback);
+
 
 // Oppdaterer statusen til en ticket
 // - Krever at brukeren er logget inn (via `isLoggedIn` middleware som brukes globalt i denne filen)
@@ -20,7 +24,7 @@ router.delete('/:id', isLoggedIn, ticketController.deleteTicket);
 // - Bruker `ticketController.updateTicketStatus` for å håndtere oppdateringen
 
 router.patch('/:id/status', 
-    restrictTo('admin'), 
+    restrictTo('admin', 'førsteLinjeSupport', 'andreLinjeSupport'), 
     ticketController.updateTicketStatus
 );
 
@@ -30,8 +34,13 @@ router.patch('/:id/status',
 // - Bruker `ticketController.updateTicketPriority` for å håndtere oppdateringen
 
 router.patch('/:id/priority', 
-    restrictTo('admin'), 
+    restrictTo('admin', 'førsteLinjeSupport', 'andreLinjeSupport'), 
     ticketController.updateTicketPriority
+);
+
+router.patch('/:id/assign', 
+    restrictTo('admin'), 
+    ticketController.assignTicket
 );
 
 module.exports = router;

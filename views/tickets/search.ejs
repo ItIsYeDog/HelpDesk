@@ -1,0 +1,105 @@
+<%- include('../partials/dashboardHeader') %>
+
+<div class="min-h-screen flex flex-col bg-gray-100">
+    <div class="flex flex-1">
+        <!-- Sidebar -->
+        <div class="hidden md:block">
+            <%- include('../partials/sidebar') %>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 md:ml-64 flex flex-col">
+            <!-- Header -->
+            <header class="hidden md:block bg-white shadow-sm">
+                <div class="flex items-center justify-between h-16 px-8">
+                    <h1 class="text-2xl font-semibold text-gray-900">Søk etter Tickets</h1>
+                </div>
+            </header>
+
+            <!-- Main Section -->
+            <main class="flex-1 p-4 md:p-8 mt-16 md:mt-0">
+                <div class="bg-white rounded-lg shadow-sm p-6">
+                    <form id="filterForm" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div>
+                            <label for="search" class="block text-sm font-medium text-gray-700">Søk</label>
+                            <input type="text" id="search" name="search" placeholder="Søk etter tittel eller beskrivelse"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                        </div>
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                            <select id="status" name="status"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                <option value="">Alle</option>
+                                <option value="Åpen">Åpen</option>
+                                <option value="Under arbeid">Under arbeid</option>
+                                <option value="Løst">Løst</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="priority" class="block text-sm font-medium text-gray-700">Prioritet</label>
+                            <select id="priority" name="priority"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                <option value="">Alle</option>
+                                <option value="Lav">Lav</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Høy">Høy</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="assignedTo" class="block text-sm font-medium text-gray-700">Tildelt til</label>
+                            <select id="assignedTo" name="assignedTo"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                <option value="">Alle</option>
+                                <% users.forEach(user => { %>
+                                    <option value="<%= user._id %>"><%= user.username %></option>
+                                <% }) %>
+                            </select>
+                        </div>
+                        <div class="md:col-span-4 flex justify-end">
+                            <button type="submit"
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                                Filtrer
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Liste over Tickets -->
+                    <ul class="divide-y divide-gray-200">
+                        <% tickets.forEach(ticket => { %>
+                            <li class="py-4 flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-sm font-medium text-gray-900"><%= ticket.title %></h3>
+                                    <p class="text-sm text-gray-500"><%= ticket.description %></p>
+                                </div>
+                                <div>
+                                    <span class="px-2 py-1 text-xs rounded-full
+                                        <%= ticket.status === 'Åpen' ? 'bg-yellow-100 text-yellow-800' : 
+                                            ticket.status === 'Under arbeid' ? 'bg-blue-100 text-blue-800' : 
+                                            'bg-green-100 text-green-800' %>">
+                                        <%= ticket.status %>
+                                    </span>
+                                </div>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </div>
+            </main>
+            <footer class="bg-white border-t border-gray-200 mt-auto">
+                <div class="mx-auto px-4 md:px-6 py-4">
+                    <p class="text-center text-xs md:text-sm text-gray-500">
+                        &copy; <%= new Date().getFullYear() %> Helpdesk System. Alle rettigheter reservert.
+                    </p>
+                </div>
+            </footer>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('filterForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const params = new URLSearchParams(new FormData(this)).toString();
+        window.location.href = `/tickets/search?${params}`;
+    });
+</script>

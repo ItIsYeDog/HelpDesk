@@ -90,11 +90,15 @@ exports.getTicket = async (req, res) => {
 exports.updateTicketStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        console.log('Status mottatt fra klient:', status); // Logg statusen
         const ticket = await Ticket.findById(req.params.id);
 
         if (!ticket) {
+            console.error('Ticket ikke funnet');
             return res.status(404).json({ success: false, message: 'Ticket ikke funnet' });
         }
+
+        console.log('Oppdaterer status for ticket:', ticket._id);
 
         // Oppdater status
         await TicketHistory.create({
@@ -111,6 +115,7 @@ exports.updateTicketStatus = async (req, res) => {
 
         res.json({ success: true, ticket });
     } catch (err) {
+        console.error('Feil under oppdatering av status:', err.message);
         res.status(400).json({ success: false, message: err.message });
     }
 };
@@ -215,23 +220,54 @@ exports.getTicketHistory = async (req, res) => {
 
 exports.deleteTicket = async (req, res) => {
     try {
+        //console.log('Forsøker å slette ticket med ID:', req.params.id); DEBUG
+
+        // Finn ticketen basert på ID
         const ticket = await Ticket.findById(req.params.id);
 
         if (!ticket) {
-            return res.status(404).json({ message: 'Ticket ikke funnet' });
+            console.error('Ticket ikke funnet');
+            return res.status(404).render('error', {
+                title: 'Ikke funnet',
+                status: 404,
+                message: 'Ticket ikke funnet'
+            });
         }
+
+        // console.log('Ticket funnet:', ticket); //DEBUG
 
         // Sjekk om ticket er løst
         if (ticket.status !== 'Løst') {
-            return res.status(400).json({ message: 'Kun løste tickets kan slettes' });
+            console.warn(`Kan ikke slette ticket med status "${ticket.status}"`);
+            return res.status(400).render('error', {
+                title: 'Kan ikke slette',
+                status: 400,
+                message: 'Kun løste tickets kan slettes'
+            });
         }
 
-        // Slett ticket
-        await ticket.remove();
-        res.status(200).json({ message: 'Ticket slettet' });
+        //console.log('Sletter relaterte data for ticket:', ticket._id); //DEBUG
+
+        // Slett relaterte data
+        await TicketHistory.deleteMany({ ticketId: ticket._id });
+        //console.log('Relaterte oppføringer i TicketHistory slettet.'); //DEBUG
+
+        await Message.deleteMany({ ticketId: ticket._id });
+        //console.log('Relaterte meldinger slettet.'); //DEBUG
+
+        // Slett ticketen
+        await ticket.deleteOne(); // Bruker deleteOne() i stedet for remove()
+        //console.log('Ticket slettet:', ticket._id); //DEBUG
+
+        // Send admin tilbake til dashboardet
+        res.redirect('/dashboard/admin');
     } catch (err) {
         console.error('Feil under sletting av ticket:', err);
-        res.status(500).json({ message: 'Noe gikk galt under sletting av ticket' });
+        res.status(500).render('error', {
+            title: 'Feil',
+            status: 500,
+            message: 'Noe gikk galt under sletting av ticket'
+        });
     }
 };
 

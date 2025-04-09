@@ -5,13 +5,12 @@ Et support-system bygget med Node.js, Express og MongoDB som lar brukere opprett
 ## Funksjonaliteter
 
 - Brukerautentisering (innlogging/registrering)
-- Ticket håndtering
-- Real-time chat
-- Admin dashboard
-- Ticket historikk
-- Prioritetshåndtering
-- Statushåndtering
-- Responsivt design
+- Ticket håndtering (opprettelse, oppdatering, historikk)
+- Real-time chat med Socket.IO
+- Admin dashboard for administrasjon av brukere og tickets
+- Prioritetshåndtering og statusoppdateringer
+- Responsivt design med Tailwind CSS
+- Rollebasert tilgangskontroll (bruker, admin, førsteLinjeSupport, andreLinjeSupport)
 
 ## Teknologi Stack
 
@@ -24,25 +23,25 @@ Et support-system bygget med Node.js, Express og MongoDB som lar brukere opprett
 ## Installasjon
 
 1. Klon repository
-```bash
-git clone <repository-url>
-cd helpdesk-prosjekt
-```
+   ```bash
+   git clone <repository-url>
+   cd helpdesk-prosjekt
+   ```
 
 2. Installer avhengigheter
-```bash
-npm install
-```
+   ```bash
+   npm install
+   ```
 
 3. Sett opp miljøvariabler
-```bash
-cp .env.example .env
-```
+   ```bash
+   cp .env.example .env
+   ```
 
 4. Start serveren
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
 ## Miljøvariabler
 
@@ -52,6 +51,7 @@ PORT=3000
 MONGODB_URI=mongodb://localhost:27017/helpdesk
 JWT_SECRET=your_jwt_secret
 JWT_EXPIRES_IN=7d
+JWT_COOKIE_EXPIRES_IN=7h
 ```
 
 ## API Ruter
@@ -72,6 +72,7 @@ JWT_EXPIRES_IN=7d
 ### Admin Routes
 - `PATCH /tickets/:id/status` - Oppdater ticket status
 - `PATCH /tickets/:id/priority` - Oppdater ticket prioritet
+- `GET /dashboard/admin/users` - Administrer brukere
 
 ### Dashboard
 - `GET /dashboard/user` - Bruker dashboard
@@ -84,7 +85,8 @@ JWT_EXPIRES_IN=7d
 {
   username: String,
   password: String,
-  role: String ['user', 'admin']
+  role: String ['user', 'admin', 'førsteLinjeSupport', 'andreLinjeSupport'],
+  createdAt: Date
 }
 ```
 
@@ -96,7 +98,9 @@ JWT_EXPIRES_IN=7d
   status: String ['Åpen', 'Under arbeid', 'Løst'],
   priority: String ['Lav', 'Medium', 'Høy'],
   category: String,
-  createdBy: User reference
+  createdBy: User reference,
+  assignedTo: User reference,
+  createdAt: Date
 }
 ```
 
@@ -105,7 +109,8 @@ JWT_EXPIRES_IN=7d
 {
   ticketId: Ticket reference,
   sender: User reference,
-  content: String
+  content: String,
+  createdAt: Date
 }
 ```
 
@@ -114,15 +119,30 @@ JWT_EXPIRES_IN=7d
 {
   ticketId: Ticket reference,
   updatedBy: User reference,
-  changeType: String ['status', 'priority', 'comment'],
+  changeType: String ['status', 'priority', 'comment', 'assignedTo'],
   oldValue: String,
-  newValue: String
+  newValue: String,
+  createdAt: Date
 }
 ```
 
+## Diagrammer
+
+### ER-diagram
+Her er en oversikt over databasens struktur og relasjoner mellom modellene:
+
+![ER-diagram](./images/my-image.png)
+
+
+### Topografisk Kart
+Her er en oversikt over nettverksflyten og infrastrukturen:
+
+![Topografisk Kart](./images/topo.png)
+
+
 ## Sikkerhet
 
-- Rate limiting på API endepunkter
+- Rate limiting på API-endepunkter
 - JWT autentisering
 - Middleware for rollebasert tilgangskontroll
 - Input validering
@@ -146,7 +166,3 @@ JWT_EXPIRES_IN=7d
 3. Commit endringer (`git commit -m 'Add some AmazingFeature'`)
 4. Push til branch (`git push origin feature/AmazingFeature`)
 5. Åpne en Pull Request
-
-## Lisens
-
-Dette prosjektet er lisensiert under MIT License - se [LICENSE](LICENSE) filen for detaljer.

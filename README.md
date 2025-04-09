@@ -131,7 +131,7 @@ JWT_COOKIE_EXPIRES_IN=7h
 ### ER-diagram
 Her er en oversikt over databasens struktur og relasjoner mellom modellene:
 
-![ER-diagram](./images/my-image.png)
+![ER-diagram](https://github.com/user-attachments/assets/c1e7bf96-7614-4643-b3ec-a803cd20a61f)
 
 
 ### Topografisk Kart

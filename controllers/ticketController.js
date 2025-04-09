@@ -6,7 +6,14 @@ const User = require('../models/User');
 exports.getNewTicketForm = (req, res) => {
     res.render('tickets/new', {
         title: 'Ny Ticket',
-        categories: ['Hardware', 'Software', 'Network', 'Other'],
+        categories: [            
+            'Maskinvare',       
+            'Programvare',      
+            'Nettverk',         
+            'Brukerstøtte',     
+            'Sikkerhet',        
+            'Tilgang',          
+            'Annet'],
         user: req.user
     });
 };
@@ -28,7 +35,14 @@ exports.createTicket = async (req, res) => {
     } catch (err) {
         res.render('tickets/new', {
             title: 'Ny Ticket',
-            categories: ['Hardware', 'Software', 'Network', 'Other'],
+            categories: [            
+                'Maskinvare',       
+                'Programvare',      
+                'Nettverk',         
+                'Brukerstøtte',     
+                'Sikkerhet',        
+                'Tilgang',          
+                'Annet'],
             error: err.message
         });
     }

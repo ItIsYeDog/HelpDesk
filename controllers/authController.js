@@ -91,6 +91,8 @@ exports.login = async (req, res) => {
         // Omdiriger basert på brukerens rolle
         if (user.role === 'admin') {
             return res.redirect('/dashboard/admin');
+        } else if (user.role === 'førsteLinjeSupport' || user.role === 'andreLinjeSupport') {
+            return res.redirect('/dashboard/support');
         } else {
             return res.redirect('/dashboard/user');
         }

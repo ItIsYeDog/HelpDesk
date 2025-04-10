@@ -62,9 +62,12 @@ exports.isLoggedIn = async (req, res, next) => {
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.user.role)) {
-            const error = new Error('Du har ikke tilgang til denne siden');
-            error.status = 403;
-            return next(error);
+            console.warn(`Tilgang nektet: Bruker med rolle "${req.user.role}" prøvde å få tilgang.`);
+            return res.status(403).render('error', {
+                title: 'Ingen tilgang',
+                status: 403,
+                message: 'Du har ikke tilgang til denne siden'
+            });
         }
         next();
     };

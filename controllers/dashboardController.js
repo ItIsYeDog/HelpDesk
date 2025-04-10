@@ -93,7 +93,6 @@ exports.updateUserRole = async (req, res) => {
 
 exports.getSupportDashboard = async (req, res) => {
     try {
-        // Hent tickets som er tildelt support-brukeren
         const tickets = await Ticket.find({ assignedTo: req.user._id })
             .populate('createdBy', 'username')
             .sort('-createdAt');
@@ -105,6 +104,7 @@ exports.getSupportDashboard = async (req, res) => {
     } catch (err) {
         console.error('Feil under henting av support-dashboard:', err);
         res.status(500).render('error', {
+            title: 'Feil',
             message: 'Kunne ikke hente support-dashboard'
         });
     }
